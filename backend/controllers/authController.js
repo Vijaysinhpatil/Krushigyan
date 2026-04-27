@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
   try {
     const { name, email, password, location, cropType } = req.body;
 
@@ -46,7 +46,7 @@ const signup = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -85,9 +85,4 @@ const login = async (req, res) => {
     console.error('Login Error:', error);
     res.status(500).json({ message: 'Internal server error during login' });
   }
-};
-
-module.exports = {
-  signup,
-  login
 };

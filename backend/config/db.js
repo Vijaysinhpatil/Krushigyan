@@ -1,4 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Use Google DNS to prevent SRV lookup failures
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = async () => {
   try {
@@ -16,4 +20,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+export default connectDB;

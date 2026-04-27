@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Eye, EyeOff, Lock, Phone, User } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { Lexend } from "next/font/google";
 import { useState } from "react";
 
@@ -16,12 +16,62 @@ const lexend = Lexend({
 });
 
 export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  
   const router = useRouter();
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    router.push("/crop-analysis");
+    setError("");
+    setSuccess("");
+
+    if (!email || !password || (!isLogin && !name)) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
+    const body = isLogin ? { email, password } : { name, email, password };
+
+    try {
+      const response = await fetch(`http://localhost:5000${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Authentication failed");
+      } else {
+        if (isLogin) {
+          localStorage.setItem("token", data.token);
+          setSuccess("Login successful! Redirecting...");
+          setTimeout(() => router.push("/"), 1000);
+        } else {
+          setSuccess("Signup successful! Please log in.");
+          setTimeout(() => {
+            setIsLogin(true);
+            setName("");
+            setPassword("");
+            setSuccess("");
+          }, 2000);
+        }
+      }
+    } catch (err) {
+      setError("An error occurred. Please check your connection.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -45,24 +95,54 @@ export default function AuthPage() {
           <Card className="w-full max-w-md rounded-2xl border-emerald-100 bg-white shadow-lg">
             <CardContent className="p-6 sm:p-8">
               <div className="mb-7 text-center">
-                <h2 className="text-2xl font-semibold text-emerald-900">Welcome Back</h2>
-                <p className="mt-2 text-sm text-muted-foreground">Enter your details to access your dashboard.</p>
+                <h2 className="text-2xl font-semibold text-emerald-900">
+                  {isLogin ? "Welcome Back" : "Create Account"}
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {isLogin ? "Enter your details to access your dashboard." : "Join us to transform your farming."}
+                </p>
               </div>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-emerald-900/80">Full Name</label>
-                  <div className="relative">
-                    <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input required className="h-12 pl-10" placeholder="Rajesh Kumar" />
-                  </div>
+              {error && (
+                <div className="mb-4 rounded bg-red-100 p-3 text-sm text-red-700 text-center">
+                  {error}
                 </div>
+              )}
+              {success && (
+                <div className="mb-4 rounded bg-green-100 p-3 text-sm text-green-700 text-center">
+                  {success}
+                </div>
+              )}
+
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-emerald-900/80">Full Name</label>
+                    <div className="relative">
+                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        required={!isLogin}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="h-12 pl-10"
+                        placeholder="Rajesh Kumar"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-emerald-900/80">Phone or Email</label>
+                  <label className="text-sm font-medium text-emerald-900/80">Email Address</label>
                   <div className="relative">
-                    <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input required className="h-12 pl-10" placeholder="+91 98765 43210" />
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      required
+                        type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-12 pl-10"
+                      placeholder="farmer@example.com"
+                    />
                   </div>
                 </div>
 
@@ -70,7 +150,14 @@ export default function AuthPage() {
                   <label className="text-sm font-medium text-emerald-900/80">Password</label>
                   <div className="relative">
                     <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input required type={showPassword ? "text" : "password"} className="h-12 pl-10 pr-10" placeholder="••••••••" />
+                    <Input
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      type={showPassword ? "text" : "password"}
+                      className="h-12 pl-10 pr-10"
+                      placeholder="••••••••"
+                    />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
@@ -82,17 +169,21 @@ export default function AuthPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="mt-2 h-12 w-full gap-2 rounded-lg bg-emerald-900 hover:bg-emerald-800">
-                  Sign In
-                  <ArrowRight className="h-4 w-4" />
+                <Button disabled={loading} type="submit" className="mt-2 h-12 w-full gap-2 rounded-lg bg-emerald-900 hover:bg-emerald-800">
+                  {loading ? "Processing..." : (isLogin ? "Sign In" : "Sign Up")}
+                  {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>
               </form>
 
               <p className="mt-6 text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
-                <Link href="#" className="font-semibold text-emerald-800 hover:underline">
-                  Sign up
-                </Link>
+                {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="font-semibold text-emerald-800 hover:underline"
+                >
+                  {isLogin ? "Sign up" : "Sign in"}
+                </button>
               </p>
             </CardContent>
           </Card>
