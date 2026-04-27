@@ -1,0 +1,8 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/welcome/page": "app/welcome/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/page": "app/page.js",
+  "/(dashboard)/crop-analysis/page": "app/(dashboard)/crop-analysis/page.js",
+  "/(dashboard)/soil-testing/page": "app/(dashboard)/soil-testing/page.js"
+}
