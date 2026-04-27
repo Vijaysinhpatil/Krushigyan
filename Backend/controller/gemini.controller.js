@@ -23,8 +23,13 @@ export const generateGeminiResponse = async (req, res) => {
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
+      model: "gemini-1.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
     });
 
     return res.status(200).json({

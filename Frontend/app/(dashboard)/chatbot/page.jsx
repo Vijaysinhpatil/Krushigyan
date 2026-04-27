@@ -1,12 +1,89 @@
-import { Bot, Paperclip, SendHorizontal } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Bot, SendHorizontal, User, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 
 export default function ChatbotPage() {
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      role: "bot",
+      content:
+        "Hello, I am AgriBot. Ask me anything about crops, soil, fertilizer, or plant disease.",
+    },
+  ]);
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    const userText = input;
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: userText },
+    ]);
+
+    setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/ai/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: userText,
+        }),
+      });
+
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text);
+      }
+
+      if (data.success) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "bot", content: data.data },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "bot", content: data.message || "Something went wrong." },
+        ]);
+      }
+    } catch (error) {
+      console.error(error);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "bot",
+          content: "Backend server is not connected. Please check port 5000.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="mx-auto flex max-w-6xl flex-col">
       <Card className="flex min-h-[calc(100dvh-11rem)] flex-col overflow-hidden md:min-h-[calc(100vh-10rem)]">
@@ -18,7 +95,9 @@ export default function ChatbotPage() {
               </div>
               <div>
                 <CardTitle>AgriBot Assistant</CardTitle>
-                <p className="text-xs text-muted-foreground">Online and ready to help</p>
+                <p className="text-xs text-muted-foreground">
+                  Online and ready to help
+                </p>
               </div>
             </div>
             <Badge>Live</Badge>
@@ -26,44 +105,82 @@ export default function ChatbotPage() {
         </CardHeader>
 
         <CardContent className="flex-1 space-y-4 overflow-y-auto p-3 sm:p-4 md:p-6">
-          <div className="max-w-xl rounded-2xl rounded-tl-sm bg-secondary p-3 text-sm">
-            Hello John, your recent soil report shows slightly low nitrogen levels for corn growth. Want a fertilizer schedule?
-          </div>
-          <div className="ml-auto max-w-xl rounded-2xl rounded-tr-sm bg-emerald-100 p-3 text-sm text-emerald-900">
-            Yes. Also I noticed orange spots on wheat leaves, what could that be?
-          </div>
-          <div className="max-w-xl space-y-3 rounded-2xl rounded-tl-sm bg-secondary p-3 text-sm">
-            Likely Leaf Rust. I am loading a quick treatment workflow based on your region.
-            <div className="rounded-lg border bg-background p-3">
-              <div className="mb-2 flex items-center justify-between text-xs">
-                <span>Disease Pattern Analysis</span>
-                <span className="font-semibold text-emerald-800">85%</span>
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex items-start gap-2 ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {msg.role === "bot" && <Bot className="mt-2 h-4 w-4" />}
+
+              <div
+                className={`max-w-xl rounded-2xl p-3 text-sm ${
+                  msg.role === "user"
+                    ? "rounded-tr-sm bg-emerald-100 text-emerald-900"
+                    : "rounded-tl-sm bg-secondary"
+                }`}
+              >
+                {msg.content}
               </div>
-              <Progress value={85} />
+
+              {msg.role === "user" && <User className="mt-2 h-4 w-4" />}
             </div>
-          </div>
+          ))}
+
+          {loading && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              AgriBot is thinking...
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="block space-y-3 border-t bg-background/90 p-3 sm:p-4 md:p-5">
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {["How to treat rust?", "Best corn planting time?", "Check soil pH", "Punjab weather forecast"].map((item) => (
-              <Badge key={item} variant="secondary" className="whitespace-nowrap px-3 py-1">
+            {[
+              "How to treat rust?",
+              "Best corn planting time?",
+              "Check soil pH",
+              "Fertilizer schedule",
+            ].map((item) => (
+              <Badge
+                key={item}
+                variant="secondary"
+                className="cursor-pointer whitespace-nowrap px-3 py-1"
+                onClick={() => setInput(item)}
+              >
                 {item}
               </Badge>
             ))}
           </div>
+
           <div className="flex items-center gap-2 rounded-2xl border bg-white p-2">
-            <Button variant="ghost" size="sm" className="h-9 w-9 rounded-full p-0">
-              <Paperclip className="h-4 w-4" />
-            </Button>
-            <Input className="border-0 text-sm focus-visible:ring-0" placeholder="Ask AgriBot about crops, soil, weather..." />
-            <Button size="sm" className="rounded-xl">
-              <SendHorizontal className="h-4 w-4" />
+            <Input
+              className="border-0 text-sm focus-visible:ring-0"
+              placeholder="Ask AgriBot about crops, soil, weather..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSend();
+              }}
+            />
+
+            <Button
+              size="sm"
+              className="rounded-xl"
+              onClick={handleSend}
+              disabled={loading || !input.trim()}
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <SendHorizontal className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </CardFooter>
       </Card>
-      <div className="h-20 md:hidden" aria-hidden />
     </div>
   );
 }
