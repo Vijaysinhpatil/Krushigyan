@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
-import { analyzeCrop } from '../controllers/cropController.js';
+import { analyzeCrop, compareCropGrowth } from '../controllers/cropController.js';
 
 const router = express.Router();
 
@@ -36,5 +36,13 @@ const upload = multer({
 });
 
 router.post('/analyze', upload.single('image'), analyzeCrop);
+router.post(
+  '/compare',
+  upload.fields([
+    { name: 'day15Image', maxCount: 1 },
+    { name: 'day30Image', maxCount: 1 }
+  ]),
+  compareCropGrowth
+);
 
 export default router;

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { API_BASE_URL } from "@/lib/api";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -42,7 +43,7 @@ export default function AuthPage() {
     const body = isLogin ? { email, password } : { name, email, password };
 
     try {
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
@@ -55,6 +56,9 @@ export default function AuthPage() {
       } else {
         if (isLogin) {
           localStorage.setItem("token", data.token);
+          if (data.user) {
+            localStorage.setItem("user", JSON.stringify(data.user));
+          }
           setSuccess("Login successful! Redirecting...");
           setTimeout(() => router.push("/"), 1000);
         } else {
