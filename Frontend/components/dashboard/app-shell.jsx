@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { Bell, Plus } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Bell, Plus, Leaf, LogOut } from "lucide-react";
 
 import { navItems } from "@/components/dashboard/nav-items";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,14 @@ import { API_BASE_URL } from "@/lib/api";
 
 export function AppShell({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login");
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -26,6 +33,7 @@ export function AppShell({ children }) {
 
     const token = localStorage.getItem("token");
     if (!token) {
+      router.push("/login");
       return;
     }
 
@@ -67,7 +75,10 @@ export function AppShell({ children }) {
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-background to-emerald-50/60">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-emerald-100 bg-white/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6">
-          <h1 className="text-xl font-semibold tracking-tight text-emerald-900">AgriAssistant</h1>
+          <div className="flex items-center gap-2">
+            <Leaf className="h-6 w-6 text-emerald-600" />
+            <h1 className="text-2xl font-bold tracking-tight text-emerald-800">KrushiGYAN</h1>
+          </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" className="h-9 w-9 rounded-full p-0">
               <Bell className="h-4 w-4" />
@@ -75,15 +86,23 @@ export function AppShell({ children }) {
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-200 bg-emerald-100 text-sm font-semibold text-emerald-800">
               {initial}
             </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="h-9 w-9 rounded-full p-0 text-slate-500 hover:bg-red-50 hover:text-red-600" title="Logout">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
 
       <div className="mx-auto flex max-w-[1600px] pt-16">
-        <aside className="sticky top-16 hidden h-[calc(100vh-64px)] w-72 shrink-0 border-r border-emerald-100 bg-white md:block">
-          <div className="p-5">
-            <p className="text-sm font-semibold text-emerald-900">{displayName}</p>
-            <p className="text-xs text-muted-foreground">{displayLocation}</p>
+        <aside className="sticky top-16 hidden h-[calc(100vh-64px)] w-72 shrink-0 border-r border-slate-100 shadow-[2px_0_8px_-4px_rgba(0,0,0,0.05)] bg-white md:block z-40">
+          <div className="flex items-center gap-3 p-5 border-b border-slate-50 mb-2">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-lg font-bold text-emerald-700">
+              {initial}
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="truncate text-sm font-bold text-slate-800">{displayName}</span>
+              <span className="truncate text-xs font-medium text-emerald-600">Dashboard Member</span>
+            </div>
           </div>
           <nav className="space-y-1 px-3 py-2">
             {navItems.map((item) => {
