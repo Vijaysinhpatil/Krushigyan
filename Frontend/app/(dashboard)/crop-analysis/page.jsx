@@ -7,10 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-<<<<<<< HEAD
-=======
 import { API_BASE_URL } from "@/lib/api";
->>>>>>> 261795388178aeda18d91682b90e9c8c97550a8b
 
 export default function CropAnalysisPage() {
   const [image, setImage] = useState(null);
@@ -55,23 +52,15 @@ export default function CropAnalysisPage() {
     formData.append("language", language);
 
     try {
-<<<<<<< HEAD
-=======
       const token = localStorage.getItem("token");
->>>>>>> 261795388178aeda18d91682b90e9c8c97550a8b
       // Simulate progress
       const progressInterval = setInterval(() => {
         setProgress((prev) => (prev >= 90 ? 90 : prev + 15));
       }, 500);
 
-<<<<<<< HEAD
-      const response = await fetch("http://localhost:5000/api/crop/analyze", {
-        method: "POST",
-=======
       const response = await fetch(`${API_BASE_URL}/api/crop/analyze`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
->>>>>>> 261795388178aeda18d91682b90e9c8c97550a8b
         body: formData,
       });
 
