@@ -1,4 +1,5 @@
 import fs from 'fs';
+import jwt from 'jsonwebtoken';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import SoilAnalysis from '../models/SoilAnalysis.js';
 
@@ -13,6 +14,19 @@ export const analyzeSoil = async (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
       console.error('API Key missing in environment variables');
       return res.status(500).json({ success: false, message: 'Gemini API key not configured' });
+    }
+
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const jwtSecret = process.env.JWT_SECRET || 'default_secret_fallback';
+    let userId = null;
+
+    if (token) {
+      try {
+        userId = jwt.verify(token, jwtSecret).userId;
+      } catch {
+        userId = null;
+      }
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -73,10 +87,10 @@ Ensure the response is ONLY valid JSON and not wrapped in markdown code blocks.`
     const response = result.response;
     let resultText = response.text();
 
-    if (resultText.startsWith('\`\`\`json')) {
-      resultText = resultText.replace(/^\`\`\`json/, '').replace(/\`\`\`$/, '').trim();
-    } else if (resultText.startsWith('\`\`\`')) {
-      resultText = resultText.replace(/^\`\`\`/, '').replace(/\`\`\`$/, '').trim();
+    if (resultText.startsWith('```json')) {
+      resultText = resultText.replace(/^```json/, '').replace(/```$/, '').trim();
+    } else if (resultText.startsWith('```')) {
+      resultText = resultText.replace(/^```/, '').replace(/```$/, '').trim();
     }
 
     let parsedResult;
@@ -88,6 +102,7 @@ Ensure the response is ONLY valid JSON and not wrapped in markdown code blocks.`
     }
 
     const newAnalysis = new SoilAnalysis({
+      userId,
       imageUrl: req.file.path,
       organicCarbon,
       soilTexture,

@@ -7,11 +7,11 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (token) {
-      router.push("/crop-analysis");
+      router.push("/dashboard");
     } else {
-      router.push("/welcome");
+      router.push("/login");
     }
   }, [router]);
 
