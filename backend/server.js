@@ -9,6 +9,9 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import cropRoutes from './routes/cropRoutes.js';
 import soilRoutes from './routes/soilRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import schemeRoutes from './routes/schemeRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +30,9 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/crop', cropRoutes);
 app.use('/api/soil', soilRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/schemes', schemeRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

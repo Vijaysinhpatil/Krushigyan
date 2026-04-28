@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import CropAnalysis from '../models/CropAnalysis.js';
+import SoilAnalysis from '../models/SoilAnalysis.js';
 
 export const signup = async (req, res) => {
   try {
@@ -84,5 +86,41 @@ export const login = async (req, res) => {
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({ message: 'Internal server error during login' });
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    if (!token) {
+      return res.status(401).json({ message: 'Authorization token is required' });
+    }
+
+    const jwtSecret = process.env.JWT_SECRET || 'default_secret_fallback';
+    const decoded = jwt.verify(token, jwtSecret);
+    const user = await User.findById(decoded.userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const [cropAnalysisCount, soilAnalysisCount] = await Promise.all([
+      CropAnalysis.countDocuments({ userId: user._id }),
+      SoilAnalysis.countDocuments({ userId: user._id })
+    ]);
+
+    res.status(200).json({
+      user,
+      stats: {
+        cropAnalysisCount,
+        soilAnalysisCount,
+        totalAnalysisCount: cropAnalysisCount + soilAnalysisCount
+      }
+    });
+  } catch (error) {
+    console.error('Get Current User Error:', error);
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
