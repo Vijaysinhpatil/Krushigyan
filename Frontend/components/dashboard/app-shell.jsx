@@ -8,7 +8,7 @@ import { Bell, Plus, Leaf, LogOut } from "lucide-react";
 import { navItems } from "@/components/dashboard/nav-items";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 export function AppShell({ children }) {
   const pathname = usePathname();
@@ -41,7 +41,7 @@ export function AppShell({ children }) {
 
     const loadUser = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const response = await fetch(`${BASE_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`
           },

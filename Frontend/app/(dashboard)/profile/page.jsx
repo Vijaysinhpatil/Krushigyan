@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 const settings = [
   { label: "Personal Information", icon: CircleUserRound },
@@ -45,7 +45,7 @@ export default function ProfilePage() {
 
     const loadProfile = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const response = await fetch(`${BASE_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`
           },
