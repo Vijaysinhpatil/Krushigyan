@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 export default function GovtSchemesPage() {
   const [schemes, setSchemes] = useState([]);
@@ -21,7 +21,7 @@ export default function GovtSchemesPage() {
   useEffect(() => {
     const fetchSchemes = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/schemes`);
+        const response = await fetch(`${BASE_URL}/api/schemes`);
         const data = await response.json();
         if (data.success) {
           setSchemes(data.data);

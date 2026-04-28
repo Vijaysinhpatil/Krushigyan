@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 export default function SoilTestingPage() {
   const [image, setImage] = useState(null);
@@ -55,7 +55,7 @@ export default function SoilTestingPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/api/soil/analyze`, {
+      const response = await fetch(`${BASE_URL}/api/soil/analyze`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,

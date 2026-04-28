@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 export default function PlantReviewsPage() {
   const [posts, setPosts] = useState([]);
@@ -32,7 +32,7 @@ export default function PlantReviewsPage() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/reviews`);
+      const response = await fetch(`${BASE_URL}/api/reviews`);
       const data = await response.json();
       if (data.success) {
         setPosts(data.data);
@@ -63,7 +63,7 @@ export default function PlantReviewsPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+      const response = await fetch(`${BASE_URL}/api/reviews`, {
         method: "POST",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -93,7 +93,7 @@ export default function PlantReviewsPage() {
     setSuggestionLoading(prev => ({ ...prev, [postId]: true }));
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/api/reviews/${postId}/comment`, {
+      const response = await fetch(`${BASE_URL}/api/reviews/${postId}/comment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +116,7 @@ export default function PlantReviewsPage() {
   const handleHelpful = async (postId, suggestionId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/api/reviews/${postId}/helpful/${suggestionId}`, {
+      const response = await fetch(`${BASE_URL}/api/reviews/${postId}/helpful/${suggestionId}`, {
         method: "PATCH",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` })
@@ -134,7 +134,7 @@ export default function PlantReviewsPage() {
   const handleMarkBest = async (postId, suggestionId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/api/reviews/${postId}/best/${suggestionId}`, {
+      const response = await fetch(`${BASE_URL}/api/reviews/${postId}/best/${suggestionId}`, {
         method: "PATCH",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` })
@@ -261,7 +261,7 @@ export default function PlantReviewsPage() {
                   {/* Image side */}
                   <div className="w-full md:w-1/3 bg-slate-100 flex items-center justify-center p-4">
                     <img 
-                      src={`${API_BASE_URL}${post.imagePath}`} 
+                      src={`${BASE_URL}${post.imagePath}`} 
                       alt="Crop Issue" 
                       className="rounded-lg object-cover w-full max-h-[300px]"
                       onError={(e) => { e.target.src = '/placeholder.svg' }}

@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 export default function ChatbotPage() {
   const [input, setInput] = useState("");
@@ -164,7 +164,7 @@ export default function ChatbotPage() {
     try {
       const token = localStorage.getItem("token");
       
-      const response = await fetch(`${API_BASE_URL}/api/ai/generate`, {
+      const response = await fetch(`${BASE_URL}/api/ai/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

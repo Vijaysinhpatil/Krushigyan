@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { API_BASE_URL } from "@/lib/api";
+import { BASE_URL } from "@/utils/api";
 
 const createPreview = (file) => (file ? URL.createObjectURL(file) : null);
 
@@ -99,7 +99,7 @@ export default function GrowthComparisonPage() {
         setProgress((prev) => (prev >= 90 ? 90 : prev + 12));
       }, 450);
 
-      const response = await fetch(`${API_BASE_URL}/api/crop/compare`, {
+      const response = await fetch(`${BASE_URL}/api/crop/compare`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData
