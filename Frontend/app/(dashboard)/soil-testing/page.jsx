@@ -7,10 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-<<<<<<< HEAD
-=======
 import { API_BASE_URL } from "@/lib/api";
->>>>>>> 261795388178aeda18d91682b90e9c8c97550a8b
 
 export default function SoilTestingPage() {
   const [image, setImage] = useState(null);
@@ -57,15 +54,10 @@ export default function SoilTestingPage() {
     formData.append("language", language);
 
     try {
-<<<<<<< HEAD
-      const response = await fetch("http://localhost:5000/api/soil/analyze", {
-        method: "POST",
-=======
       const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/api/soil/analyze`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
->>>>>>> 261795388178aeda18d91682b90e9c8c97550a8b
         body: formData,
       });
 
