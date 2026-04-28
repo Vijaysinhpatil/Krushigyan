@@ -1,3 +1,9 @@
 {
-  "/(dashboard)/chatbot/page": "app/(dashboard)/chatbot/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/login/page": "app/login/page.js",
+  "/(dashboard)/chatbot/page": "app/(dashboard)/chatbot/page.js",
+  "/(dashboard)/growth-comparison/page": "app/(dashboard)/growth-comparison/page.js",
+  "/(dashboard)/govt-schemes/page": "app/(dashboard)/govt-schemes/page.js",
+  "/(dashboard)/plant-reviews/page": "app/(dashboard)/plant-reviews/page.js",
+  "/(dashboard)/profile/page": "app/(dashboard)/profile/page.js"
 }
